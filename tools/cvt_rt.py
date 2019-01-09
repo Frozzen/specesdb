@@ -9,7 +9,7 @@ import sys
 
 def convert_rt(fpath):
     """
-    переименовываем файлы d cnerneht на название растения + cnt - по факту это название последней папки
+    переименовываем файлы на название растения + cnt - по факту это название последней папки
     :param fpath:
     :return:
     """
@@ -27,9 +27,22 @@ def convert_rt(fpath):
             cnt = cnt+1
 
 
+def convert_kosoburov_lek_syr(fname):
+    """
+    конвертировать тексты в json
+    :param fname:
+    :return:
+    """
+    fp = open(fname, 'rt')
+    for ln in fp:
+        pass
+    fp.close()
+
+
 def main(argv):
-    convert_rt('~/work/spicedb/Растительное сырье/тибетская классификация')
-    convert_rt('~/work/spicedb/Растительное сырье/русская классификация')
+    #convert_rt('~/work/spicedb/Растительное сырье/тибетская классификация')
+    #convert_rt('~/work/spicedb/Растительное сырье/русская классификация')
+    convert_kosoburov_lek_syr('../text/Кособуров-сырье-растительное.txt')
 
 if __name__ == '__main__':
     main(sys.argv)

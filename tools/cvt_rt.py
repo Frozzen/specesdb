@@ -5,13 +5,15 @@
 """
 import json
 import os
+import re
 import sys
+import uuid
 
 
 def convert_rt(fpath):
     """
     переименовываем файлы на название растения + cnt - по факту это название последней папки
-    :param fpath:
+    :param fpath: нужен абсолютный путь
     :return:
     """
     for root, dir, files in os.walk(fpath):
@@ -53,18 +55,19 @@ def convert_kosoburov_lek_syr(fname, outf):
                     state = 'start'
                     result.append(item)
                 else:
+                    ln = re.sub(r'\[([а-яa-z ]+)\]', r'\1', ln)
                     iv = ln.split(':')
                     if len(iv) == 1:
                         item[last_key] += iv[0]
                     else:
-                        last_key =iv[0]
-                        item[last_key] = iv[1].strip()
+                        last_key = iv[0]
+                        item[last_key] = iv[1].strip().replace('"', '')
 
     with open(outf, 'w') as fp:
         json.dump(result, fp, ensure_ascii=False)
 
 
-def build_rt_syn(fpath, outf):
+def build_rt_syn(fpath, outf, source):
     """
     составить исходник название - аналог по РТ
     :param outf:
@@ -72,7 +75,8 @@ def build_rt_syn(fpath, outf):
     :return:
     """
     result = []
-    item = {"source": "Ринчен Тензин давал на лекциях"}
+    source['GUID'] = uuid.uuid4().hex
+    item = source
     for root, dir, files in os.walk(fpath):
         path = root.split(os.sep)
         dirn = os.path.basename(root)
@@ -88,18 +92,48 @@ def build_rt_syn(fpath, outf):
         json.dump(result, fp, ensure_ascii=False)
 
 
+def do_src_index(fpath, outf, source):
+    """
+    сканируем папку и строим индекс трав в наличии
+    :param fpath:
+    :param outf:
+    :param source:
+    :return: {
+    "source": {"source":"...", "GUID":"...",
+    "herb": ['file1', 'file2']
+    }
+    """
+    uid = source['GUID'] = uuid.uuid4().hex
+    result = {"source": source }
+
+    for root, dir, files in os.walk(fpath):
+        path = root.split(os.sep)
+        dirn = os.path.basename(root)
+        if len(files) > 0:
+            herb = root.split(os.sep)[-1]
+            result[herb] = files
+
+    with open(outf, 'w') as fp:
+        json.dump(result, fp, ensure_ascii=False)
+
+
 
 def main(argv):
     # convert_rt('~/work/spicedb/Растительное сырье/тибетская классификация')
-    # convert_rt('~/work/spicedb/Растительное сырье/русская классификация')
-    # convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
-    #                           'text/kosoburov-rast.json')
+    # convert_rt('/home/vovva/work/spicedb/Растительное сырье/русская классификация')
+    # convert_rt('/home/vovva/work/spicedb/Ширшов/Фотогербарий')
     # build_rt_syn('/home/vovva/work/spicedb/Растительное сырье/тибетская классификация',
-    #              'text/rt-rast.json')
+    #              'text/rt-rast.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
+    # do_src_index('/home/vovva/work/spicedb/Растительное сырье/русская классификация',
+    #              'text/rt-herb-index.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
+    # do_src_index('/home/vovva/work/spicedb/Ширшов/Фотогербарий',
+    #              'text/shirshov-herb-index.json', {"source": "ширшовский гербарий"})
+    convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
+                              'text/kosoburov-rast.json')
     # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-животное.txt',
     #                           'text/kosoburov-process-anim.json')
-    convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-минеральное.txt',
-                              'text/kosoburov-process-stone.json')
+    # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-минеральное.txt',
+    #                           'text/kosoburov-process-stone.json')
 
 
 if __name__ == '__main__':

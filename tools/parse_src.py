@@ -44,7 +44,7 @@ def parce_botanic(data):
             }
         }
 
-       regexp = (/[а-я\-\s()\?]+/)?([а-я\-\s\(\)\?]+)?([A-z \.\-]+)?[\,]?"
+       regexp = r'([а-я\-\s()?]+)?[\s]+([A-z\s.\-]+)?[,]?[\s]?(/[а-я\-\s()?",]+/)?[\s]?(\[[0-9, ]+\])?'
     :param data:
     :return:
     """
@@ -70,13 +70,13 @@ def find_spices_src(regex, res, text):
     for m in matches:
         t = {}
         if m[0] is not None:
-            t["comment"] = m[0]
+            t["comment"] = m[0].strip()
         if m[1] is not None:
-            t["rus_name"] = m[1]
+            t["rus_name"] = m[1].strip().replace('/','')
         if m[2] is not None:
-             t["latin_name"] = m[2]
+             t["latin_name"] = m[2].strip()
         if m[3] is not None:
-             t["ref"] = m[3]
+             t["ref"] = m[3].strip()
         if t != {}:
             res.append(t)
     return res

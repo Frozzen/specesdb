@@ -10,12 +10,13 @@ import sys
 import uuid
 
 
-def convert_rt(fpath):
+def fix_files_in_folder(fpath):
     """
     переименовываем файлы на название растения + cnt - по факту это название последней папки
     :param fpath: нужен абсолютный путь
     :return:
     """
+    cdir = os.getcwd()
     for root, dir, files in os.walk(fpath):
         path = root.split(os.sep)
         dirn = os.path.basename(root)
@@ -23,11 +24,12 @@ def convert_rt(fpath):
         cnt = 0
         for file in files:
             fname, ext = os.path.splitext(file)
-            fto = "%s-%s%s" % (dirn, str(cnt), ext.lower())
+            fto = ("%s-%s%s" % (dirn, str(cnt), ext)).lower()
             print(len(path) * u'---', file, '\t\t', fto)
             os.chdir(root)
             os.rename(file, fto)
             cnt = cnt + 1
+    os.chdir(cdir)
 
 
 def convert_kosoburov_lek_syr(fname, outf):
@@ -110,7 +112,7 @@ def do_src_index(fpath, outf, source):
         path = root.split(os.sep)
         dirn = os.path.basename(root)
         if len(files) > 0:
-            herb = root.split(os.sep)[-1]
+            herb = root.split(os.sep)[-1].lower()
             result[herb] = files
 
     with open(outf, 'w') as fp:
@@ -119,17 +121,17 @@ def do_src_index(fpath, outf, source):
 
 
 def main(argv):
-    # convert_rt('~/work/spicedb/Растительное сырье/тибетская классификация')
-    # convert_rt('/home/vovva/work/spicedb/Растительное сырье/русская классификация')
-    # convert_rt('/home/vovva/work/spicedb/Ширшов/Фотогербарий')
+    # fix_files_in_folder('~/work/spicedb/Растительное сырье/тибетская классификация')
+    # fix_files_in_folder('/home/vovva/work/spicedb/Растительное сырье/русская классификация')
+    fix_files_in_folder('/home/vovva/work/spicedb/Ширшов/Фотогербарий')
     # build_rt_syn('/home/vovva/work/spicedb/Растительное сырье/тибетская классификация',
     #              'text/rt-rast.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
     # do_src_index('/home/vovva/work/spicedb/Растительное сырье/русская классификация',
     #              'text/rt-herb-index.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
-    # do_src_index('/home/vovva/work/spicedb/Ширшов/Фотогербарий',
-    #              'text/shirshov-herb-index.json', {"source": "ширшовский гербарий"})
-    convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
-                              'text/kosoburov-rast.json')
+    do_src_index('/home/vovva/work/spicedb/Ширшов/Фотогербарий',
+                 'text/shirshov-herb-index.json', {"source": "ширшовский гербарий"})
+    # convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
+    #                           'text/kosoburov-rast.json')
     # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-животное.txt',
     #                           'text/kosoburov-process-anim.json')
     # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-минеральное.txt',

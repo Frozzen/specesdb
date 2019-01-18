@@ -13,7 +13,8 @@ import uuid
 def fix_files_in_folder(fpath):
     """
     переименовываем файлы на название растения + cnt - по факту это название последней папки
-    :param fpath: нужен абсолютный путь
+
+    :param fpath: нужен абсолютный путь к коренной папке
     :return:
     """
     cdir = os.getcwd()
@@ -47,7 +48,7 @@ def convert_kosoburov_lek_syr(fname, outf):
         for ln in fp:
             ln = ln.rstrip()
             if state == 'title':
-                result.append({"source": ln})
+                result.append({"source": ln, "GUID":uuid.uuid4().hex})
                 state = 'start'
             elif state == 'start':
                 item = {"tib_name": ln.strip()}
@@ -121,21 +122,21 @@ def do_src_index(fpath, outf, source):
 
 
 def main(argv):
-    # fix_files_in_folder('~/work/spicedb/Растительное сырье/тибетская классификация')
+    # fix_files_in_folder('/home/vovva/work/spicedb/Растительное сырье/тибетская классификация')
     # fix_files_in_folder('/home/vovva/work/spicedb/Растительное сырье/русская классификация')
-    fix_files_in_folder('/home/vovva/work/spicedb/Ширшов/Фотогербарий')
-    # build_rt_syn('/home/vovva/work/spicedb/Растительное сырье/тибетская классификация',
-    #              'text/rt-rast.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
-    # do_src_index('/home/vovva/work/spicedb/Растительное сырье/русская классификация',
-    #              'text/rt-herb-index.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
+    # fix_files_in_folder('/home/vovva/work/spicedb/Ширшов/Фотогербарий')
+    build_rt_syn('/home/vovva/work/spicedb/Растительное сырье/тибетская классификация',
+                 'text/rt-rast.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
+    do_src_index('/home/vovva/work/spicedb/Растительное сырье/русская классификация',
+                 'text/rt-herb-index.json', {"source": "Ринчен Тензин давал на лекциях аналоги"})
     do_src_index('/home/vovva/work/spicedb/Ширшов/Фотогербарий',
                  'text/shirshov-herb-index.json', {"source": "ширшовский гербарий"})
-    # convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
-    #                           'text/kosoburov-rast.json')
-    # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-животное.txt',
-    #                           'text/kosoburov-process-anim.json')
-    # convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-минеральное.txt',
-    #                           'text/kosoburov-process-stone.json')
+    convert_kosoburov_lek_syr('text/Лекарственное сырье тибетской медицины современный взгляд - 2006.txt',
+                              'text/kosoburov-rast.json')
+    convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-животное.txt',
+                              'text/kosoburov-process-anim.json')
+    convert_kosoburov_lek_syr('text/Технологическая обработка лекарственного сырья тибетской медицины - 2005-минеральное.txt',
+                              'text/kosoburov-process-stone.json')
 
 
 if __name__ == '__main__':
